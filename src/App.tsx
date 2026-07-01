@@ -2,12 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import MoneyPotProgressScreen from "./components/MoneyPotProgressScreen";
 import PhoneFrame from "./components/PhoneFrame";
 import ProgressControls from "./components/ProgressControls";
+import RouteEditor from "./components/RouteEditor";
 import { clampProgress } from "./utils/pathProgress";
 
 const SIMULATION_STEPS = [0, 0.25, 0.5, 0.75, 1];
 const STEP_DELAY_MS = 900;
 
+type AppMode = "prototype" | "editor";
+
 export default function App() {
+  const [mode, setMode] = useState<AppMode>("prototype");
   const [progress, setProgress] = useState(0.25);
   const [isSimulating, setIsSimulating] = useState(false);
   const simulationRef = useRef<number[]>([]);
@@ -51,20 +55,43 @@ export default function App() {
 
   return (
     <div className="app">
-      <div className="app__layout">
-        <PhoneFrame>
-          <MoneyPotProgressScreen
-            progress={progress}
-            onBack={() => setProgress(0)}
-          />
-        </PhoneFrame>
+      <div className="app__shell">
+        <nav className="app__tabs" aria-label="Prototype modes">
+          <button
+            type="button"
+            className={`app__tab ${mode === "prototype" ? "app__tab--active" : ""}`}
+            onClick={() => setMode("prototype")}
+          >
+            Prototype
+          </button>
+          <button
+            type="button"
+            className={`app__tab ${mode === "editor" ? "app__tab--active" : ""}`}
+            onClick={() => setMode("editor")}
+          >
+            Route Editor
+          </button>
+        </nav>
 
-        <ProgressControls
-          progress={progress}
-          onProgressChange={handleProgressChange}
-          onSimulateSaving={handleSimulateSaving}
-          isSimulating={isSimulating}
-        />
+        {mode === "prototype" ? (
+          <div className="app__layout">
+            <PhoneFrame>
+              <MoneyPotProgressScreen
+                progress={progress}
+                onBack={() => setProgress(0)}
+              />
+            </PhoneFrame>
+
+            <ProgressControls
+              progress={progress}
+              onProgressChange={handleProgressChange}
+              onSimulateSaving={handleSimulateSaving}
+              isSimulating={isSimulating}
+            />
+          </div>
+        ) : (
+          <RouteEditor />
+        )}
       </div>
     </div>
   );

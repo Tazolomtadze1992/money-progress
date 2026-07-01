@@ -58,6 +58,44 @@ button {
   padding: 32px 24px;
 }
 
+.app__shell {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.app__tabs {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+.app__tab {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.app__tab:hover {
+  color: var(--color-text);
+  background: var(--color-primary-muted);
+}
+
+.app__tab--active {
+  color: var(--color-primary);
+  background: var(--color-primary-muted);
+}
+
 .app__layout {
   display: flex;
   align-items: flex-start;
@@ -216,7 +254,7 @@ button {
 
 .journey-map {
   width: 100%;
-  aspect-ratio: 342 / 319;
+  aspect-ratio: 342 / 322;
 }
 
 .journey-map__svg {
@@ -366,6 +404,185 @@ button {
   cursor: not-allowed;
 }
 
+/* ── Route editor (debug) ── */
+
+.route-editor {
+  width: 100%;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.route-editor__preview {
+  flex: 1 1 420px;
+  max-width: 680px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.route-editor__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+}
+
+.route-editor__panel {
+  width: 320px;
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.route-editor__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.route-editor__hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+.route-editor__hint code {
+  font-size: 11px;
+  background: #eef3f6;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.route-editor__toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text);
+  margin-bottom: 16px;
+  cursor: pointer;
+}
+
+.route-editor__actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.route-editor__btn {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #ffffff;
+  transition: background-color 150ms ease;
+}
+
+.route-editor__btn:hover {
+  background: var(--color-primary-soft);
+}
+
+.route-editor__btn--secondary {
+  background: #eef3f6;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.route-editor__btn--secondary:hover {
+  background: var(--color-primary-muted);
+}
+
+.route-editor__status {
+  font-size: 12px;
+  color: var(--color-primary);
+  margin-bottom: 12px;
+}
+
+.route-editor__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.route-editor__textarea {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: #f8fafb;
+  color: var(--color-text);
+  resize: vertical;
+  margin-bottom: 16px;
+}
+
+.route-editor__subtitle {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.route-editor__coords {
+  list-style: none;
+  font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.route-editor__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.route-editor__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.route-editor__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.route-editor__swatch--anchor {
+  background: #ffffff;
+  border: 2px solid #1e6e91;
+}
+
+.route-editor__swatch--cp1 {
+  background: #ffffff;
+  border: 2px solid #e67e22;
+}
+
+.route-editor__swatch--cp2 {
+  background: #ffffff;
+  border: 2px solid #9b59b6;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .journey-map__svg path[style*="transition"] {
     transition: none !important;
@@ -389,5 +606,15 @@ button {
   .controls {
     width: 100%;
     max-width: var(--phone-width);
+  }
+
+  .route-editor {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .route-editor__panel {
+    width: 100%;
+    max-width: 680px;
   }
 }

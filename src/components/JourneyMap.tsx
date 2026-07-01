@@ -3,6 +3,7 @@ import { usePathProgress } from "../hooks/usePathProgress";
 import {
   CHECKPOINTS,
   MAP_HEIGHT,
+  MAP_IMAGE,
   MAP_WIDTH,
   ROUTE_PATH,
   getPointAtProgress,
@@ -15,15 +16,11 @@ import {
   CHECKPOINT_INACTIVE_BORDER,
   CHECKPOINT_INACTIVE_STAR,
   CREDO_PRIMARY,
-  ROUTE_ACTIVE,
 } from "../styles/colors";
 
 interface JourneyMapProps {
   progress: number;
 }
-
-const ROAD_STROKE = 20;
-const ROAD_OUTLINE_STROKE = 24;
 
 /** Simple 5-point star, centered at origin */
 function StarIcon({ size, fill }: { size: number; fill: string }) {
@@ -39,12 +36,12 @@ function StarIcon({ size, fill }: { size: number; fill: string }) {
 function AvatarMarker({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <circle r="19" fill="rgba(30, 46, 58, 0.1)" transform="translate(0, 1.5)" />
-      <circle r="18" fill="#ffffff" stroke={CREDO_PRIMARY} strokeWidth="3" />
+      <circle r="17" fill="rgba(30, 46, 58, 0.1)" transform="translate(0, 1.5)" />
+      <circle r="16" fill="#ffffff" stroke={CREDO_PRIMARY} strokeWidth="2.5" />
       <text
         textAnchor="middle"
         dominantBaseline="central"
-        fontSize="14"
+        fontSize="13"
         fontWeight="700"
         fill={CREDO_PRIMARY}
         fontFamily="Inter, sans-serif"
@@ -60,15 +57,21 @@ interface CheckpointNodeProps {
   y: number;
   label: string;
   isPassed: boolean;
+  groupOffsetX?: number;
+  groupOffsetY?: number;
 }
+
+const LABEL_GAP = 4;
 
 function CheckpointNode({
   x,
   y,
   label,
   isPassed,
+  groupOffsetX = 0,
+  groupOffsetY = 0,
 }: CheckpointNodeProps) {
-  const badgeRadius = 11;
+  const badgeRadius = 10;
   const starSize = 5.5;
 
   const isHighlighted = isPassed;
@@ -81,10 +84,10 @@ function CheckpointNode({
 
   const labelWidth = label.length > 5 ? 54 : 46;
   const labelHeight = 16;
-  const labelY = badgeRadius + 4;
+  const labelY = badgeRadius + LABEL_GAP;
 
   return (
-    <g transform={`translate(${x}, ${y})`}>
+    <g transform={`translate(${x + groupOffsetX}, ${y + groupOffsetY})`}>
       <circle
         r={badgeRadius}
         fill={badgeFill}
@@ -143,7 +146,7 @@ export default function JourneyMap({ progress }: JourneyMapProps) {
     });
   }, [progress, pathReady, state.animatedProgress, pathRef]);
 
-  const { markerPoint, totalLength, dashOffset } = state;
+  const { markerPoint, totalLength } = state;
 
   return (
     <div className="journey-map">
@@ -154,7 +157,7 @@ export default function JourneyMap({ progress }: JourneyMapProps) {
         aria-label="Savings journey progress map"
       >
         <image
-          href="/without-road.png"
+          href={MAP_IMAGE}
           x="0"
           y="0"
           width={MAP_WIDTH}
@@ -162,39 +165,8 @@ export default function JourneyMap({ progress }: JourneyMapProps) {
           preserveAspectRatio="xMidYMid meet"
         />
 
+        {/* Invisible motion path — marker & checkpoints */}
         <path ref={pathRef} d={ROUTE_PATH} fill="none" stroke="none" />
-
-        <path
-          d={ROUTE_PATH}
-          fill="none"
-          stroke="#d5cdb8"
-          strokeWidth={ROAD_OUTLINE_STROKE}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.85"
-        />
-
-        <path
-          d={ROUTE_PATH}
-          fill="none"
-          stroke="#f2ecdf"
-          strokeWidth={ROAD_STROKE}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {totalLength > 0 && (
-          <path
-            d={ROUTE_PATH}
-            fill="none"
-            stroke={ROUTE_ACTIVE}
-            strokeWidth={ROAD_STROKE}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeDasharray={totalLength}
-            strokeDashoffset={dashOffset}
-          />
-        )}
 
         {positions.map((cp) => (
           <CheckpointNode
@@ -203,6 +175,8 @@ export default function JourneyMap({ progress }: JourneyMapProps) {
             y={cp.y}
             label={cp.label}
             isPassed={cp.isPassed}
+            groupOffsetX={cp.groupOffsetX}
+            groupOffsetY={cp.groupOffsetY}
           />
         ))}
 

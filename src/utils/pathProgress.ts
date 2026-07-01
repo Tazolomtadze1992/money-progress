@@ -9,29 +9,28 @@ export interface CheckpointConfig {
   t: number;
   amount: number;
   label: string;
+  /** Optional nudge for the entire checkpoint group (badge + label) */
+  groupOffsetX?: number;
+  groupOffsetY?: number;
 }
 
-/** Matches /without-road.png pixel dimensions */
+/** Matches /lastone.png pixel dimensions */
 export const MAP_WIDTH = 342;
-export const MAP_HEIGHT = 319;
+export const MAP_HEIGHT = 322;
+
+export const MAP_IMAGE = "/lastone.png";
 
 /**
- * Winding route traced from with-road.png reference.
- * viewBox: 0 0 342 319
- *
- * Key landmarks along the path:
- * - Start: top edge (~45% from left)
- * - First bend: upper-left near pond
- * - Second bend: center-right near cottage
- * - Third bend: lower-left meadow
- * - End: bottom-right flag
+ * Motion path — tuned via Route Editor to match painted road in lastone.png.
+ * viewBox: 0 0 342 322
  */
 export const ROUTE_PATH =
-  "M 154 8 " +
-  "C 130 25, 110 55, 96 70 " +
-  "C 82 95, 160 120, 212 144 " +
-  "C 240 165, 170 178, 120 207 " +
-  "C 70 215, 200 250, 301 230";
+  "M 17.3 305.6 " +
+  "C 43.3 278.8, 129.8 304.9, 156.5 275.6 " +
+  "C 181.5 262.6, 140.1 249.2, 134.7 216.3 " +
+  "C 142.8 178.1, 217 215.6, 182 153.4 " +
+  "C 172.3 117, 244.8 132.7, 272 117.7 " +
+  "C 287.1 90.3, 254.3 107.1, 266.2 74";
 
 export const CHECKPOINTS: CheckpointConfig[] = [
   { id: "cp-1", t: 0.25, amount: 2_000, label: "2,000" },
