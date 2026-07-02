@@ -5,8 +5,11 @@ import {
   getPointAtProgress,
   type PathPoint,
 } from "../utils/pathProgress";
-
-const EASE_IN_OUT = "cubic-bezier(0.645, 0.045, 0.355, 1)";
+import {
+  easeInOutProgress,
+  prefersReducedMotion,
+  PROGRESS_ANIMATION_MS,
+} from "../utils/motion";
 
 interface UsePathProgressOptions {
   progress: number;
@@ -23,7 +26,7 @@ interface PathProgressState {
 
 export function usePathProgress({
   progress,
-  durationMs = 600,
+  durationMs = PROGRESS_ANIMATION_MS,
 }: UsePathProgressOptions): {
   pathRef: React.RefObject<SVGPathElement | null>;
   state: PathProgressState;
@@ -60,11 +63,8 @@ export function usePathProgress({
 
   useEffect(() => {
     const target = clampProgress(progress);
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
 
-    if (prefersReducedMotion) {
+    if (prefersReducedMotion()) {
       setAnimatedProgress(target);
       return;
     }
@@ -76,8 +76,7 @@ export function usePathProgress({
     const tick = (now: number) => {
       const elapsed = now - start;
       const t = Math.min(elapsed / durationMs, 1);
-      const eased =
-        t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const eased = easeInOutProgress(t);
       const next = from + (target - from) * eased;
       setAnimatedProgress(next);
 
@@ -100,4 +99,4 @@ export function usePathProgress({
   };
 }
 
-export { EASE_IN_OUT };
+export { PROGRESS_ANIMATION_MS as PATH_PROGRESS_DURATION_MS };

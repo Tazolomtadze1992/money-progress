@@ -1,4 +1,5 @@
 import { progressToPercent } from "../utils/pathProgress";
+import { useAnimatedNumber } from "../hooks/useAnimatedNumber";
 import { ROUTE_ACTIVE } from "../styles/colors";
 
 interface HeaderProgressBarProps {
@@ -6,7 +7,7 @@ interface HeaderProgressBarProps {
 }
 
 export default function HeaderProgressBar({ progress }: HeaderProgressBarProps) {
-  const percent = progressToPercent(progress);
+  const percent = useAnimatedNumber(progressToPercent(progress));
 
   return (
     <div

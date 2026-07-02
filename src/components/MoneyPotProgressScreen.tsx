@@ -1,6 +1,7 @@
 import JourneyMap from "./JourneyMap";
 import HeaderProgressBar from "./HeaderProgressBar";
 import StatCard from "./StatCard";
+import AnimatedNumber from "./AnimatedNumber";
 import {
   formatAmount,
   progressToAmount,
@@ -80,13 +81,23 @@ export default function MoneyPotProgressScreen({
             icon={<GoalIcon />}
             label="მიღწევა"
             subtitle="მიზნის შესრულება"
-            value={`${percent}%`}
+            value={
+              <AnimatedNumber
+                value={percent}
+                format={(n) => `${n}%`}
+              />
+            }
           />
           <StatCard
             icon={<WalletIcon />}
             label="თანხა"
             subtitle="აგროვებული თანხა"
-            value={`${formatAmount(savedAmount)} ₾`}
+            value={
+              <AnimatedNumber
+                value={savedAmount}
+                format={(n) => `${formatAmount(n)} ₾`}
+              />
+            }
           />
         </section>
       </main>

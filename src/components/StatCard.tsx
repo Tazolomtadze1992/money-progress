@@ -2,7 +2,7 @@ interface StatCardProps {
   icon: React.ReactNode;
   label: string;
   subtitle: string;
-  value: string;
+  value: React.ReactNode;
 }
 
 export default function StatCard({ icon, label, subtitle, value }: StatCardProps) {
