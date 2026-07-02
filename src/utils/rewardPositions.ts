@@ -10,24 +10,6 @@ export interface RewardPositions {
 
 export type RewardItemId = keyof RewardPositions;
 
-/** Progress at which the coin appears collected (decorative fade) */
-export const COIN_COLLECT_PROGRESS = 0.37;
-
-/**
- * Progress at which the chest opens (when avatar passes the chest on the route).
- * Tune to match chest placement along the path (~0.82 for current position).
- */
-export const CHEST_OPEN_PROGRESS = 0.82;
-
-/**
- * Saved reward positions in map SVG coordinates (viewBox 0 0 342 322).
- * Tune in Route Editor, then paste the exported block here.
- */
-export const REWARD_POSITIONS: RewardPositions = {
-  coin: { x: 160.1, y: 246.3 },
-  chest: { x: 211.8, y: 117 },
-};
-
 export function cloneRewardPositions(positions: RewardPositions): RewardPositions {
   return {
     coin: { ...positions.coin },
@@ -35,20 +17,34 @@ export function cloneRewardPositions(positions: RewardPositions): RewardPosition
   };
 }
 
-export function getDefaultRewardPositions(): RewardPositions {
-  return cloneRewardPositions(REWARD_POSITIONS);
-}
-
 function roundCoord(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
-export function formatRewardPositionsExport(positions: RewardPositions): string {
+export function formatRewardPositionsExport(
+  positions: RewardPositions,
+  themeId?: string,
+): string {
   const fmt = (point: RewardPoint) =>
     `{ x: ${roundCoord(point.x)}, y: ${roundCoord(point.y)} }`;
 
-  return `export const REWARD_POSITIONS = {
+  const header = themeId
+    ? `// Paste into MAP_THEMES.${themeId} in src/utils/mapThemes.ts\n`
+    : "";
+
+  return `${header}rewardPositions: {
   coin: ${fmt(positions.coin)},
   chest: ${fmt(positions.chest)},
-};`;
+},`;
+}
+
+export function formatThemeRewardExport(
+  themeId: string,
+  positions: RewardPositions,
+  coinCollectProgress: number,
+  chestOpenProgress: number,
+): string {
+  return `${formatRewardPositionsExport(positions, themeId)}
+coinCollectProgress: ${coinCollectProgress},
+chestOpenProgress: ${chestOpenProgress},`;
 }

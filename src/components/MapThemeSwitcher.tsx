@@ -12,7 +12,7 @@ export default function MapThemeSwitcher({
   return (
     <aside className="theme-switcher" aria-label="Map theme">
       <h2 className="theme-switcher__title">Map Theme</h2>
-      <p className="theme-switcher__hint">Compare soft and cartoon map styles.</p>
+      <p className="theme-switcher__hint">Compare map styles.</p>
 
       <div className="theme-switcher__options">
         {MAP_THEME_LIST.map((theme) => (

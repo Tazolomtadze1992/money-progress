@@ -1,6 +1,5 @@
 import { useCoinPickup } from "../hooks/useCoinPickup";
 import { COIN_SIZE } from "../utils/pathProgress";
-import { COIN_COLLECT_PROGRESS } from "../utils/rewardPositions";
 
 /** Max upward travel during pickup — foreignObject needs headroom above anchor */
 const PICKUP_LIFT = 22;
@@ -10,7 +9,7 @@ interface RouteCoinProps {
   y: number;
   icon: string;
   progress: number;
-  collectThreshold?: number;
+  collectThreshold: number;
 }
 
 export default function RouteCoin({
@@ -18,7 +17,7 @@ export default function RouteCoin({
   y,
   icon,
   progress,
-  collectThreshold = COIN_COLLECT_PROGRESS,
+  collectThreshold,
 }: RouteCoinProps) {
   const half = COIN_SIZE / 2;
   const { phase, onPickupAnimationEnd } = useCoinPickup(progress, collectThreshold);

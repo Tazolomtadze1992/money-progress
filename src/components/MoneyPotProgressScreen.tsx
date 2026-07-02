@@ -76,7 +76,7 @@ export default function MoneyPotProgressScreen({
 
       <main className="progress-screen__body">
         <section className="progress-screen__map-card" aria-label="პროგრესის რუკა">
-          <JourneyMap progress={progress} theme={theme} />
+          <JourneyMap key={theme.id} progress={progress} theme={theme} />
         </section>
 
         <section className="progress-screen__stats" aria-label="სტატისტიკა">

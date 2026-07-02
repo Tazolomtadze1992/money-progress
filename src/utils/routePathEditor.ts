@@ -1,5 +1,3 @@
-import { ROUTE_PATH } from "./pathProgress";
-
 export interface RoutePoint {
   x: number;
   y: number;
@@ -162,18 +160,23 @@ export function moveControlPoint(
   return updated;
 }
 
-/** Format path for pasting into ROUTE_PATH in pathProgress.ts */
-export function formatPathForExport(pathD: string): string {
+/** Format path for pasting into mapThemes.ts routePath for a theme */
+export function formatPathForExport(pathD: string, themeId?: string): string {
+  const header = themeId
+    ? `// Paste into MAP_THEMES.${themeId}.routePath in src/utils/mapThemes.ts\n`
+    : "";
   const parts = pathD.trim().split(/\s+(?=M|C)/i);
-  if (parts.length <= 1) return `"${pathD.trim()}"`;
+  if (parts.length <= 1) return `${header}"${pathD.trim()}"`;
 
-  return parts
+  const body = parts
     .map((part, index) => {
       const trimmed = part.trim();
       const suffix = index < parts.length - 1 ? " +" : "";
       return `"${trimmed} "${suffix}`;
     })
     .join("\n");
+
+  return header + body;
 }
 
 export function describeBezierRoute(route: BezierRoute): string[] {
@@ -189,5 +192,3 @@ export function describeBezierRoute(route: BezierRoute): string[] {
 
   return lines;
 }
-
-export const DEFAULT_BEZIER_ROUTE = parseBezierRoute(ROUTE_PATH);

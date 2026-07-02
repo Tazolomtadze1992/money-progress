@@ -4,14 +4,9 @@ import {
   CHECKPOINTS,
   MAP_HEIGHT,
   MAP_WIDTH,
-  ROUTE_PATH,
   getPointAtProgress,
 } from "../utils/pathProgress";
 import type { MapTheme } from "../utils/mapThemes";
-import {
-  CHEST_OPEN_PROGRESS,
-  REWARD_POSITIONS,
-} from "../utils/rewardPositions";
 import RouteCoin from "./RouteCoin";
 import RouteTreasureChest from "./RouteTreasureChest";
 import {
@@ -140,7 +135,7 @@ export default function JourneyMap({ progress, theme }: JourneyMapProps) {
       pathRef.current.getTotalLength();
       setPathReady(true);
     }
-  }, [pathRef]);
+  }, [pathRef, theme.id, theme.routePath]);
 
   const positions = useMemo(() => {
     const path = pathRef.current;
@@ -153,7 +148,7 @@ export default function JourneyMap({ progress, theme }: JourneyMapProps) {
     });
   }, [progress, pathReady, state.animatedProgress, pathRef]);
 
-  const isChestOpen = state.animatedProgress >= CHEST_OPEN_PROGRESS - 0.01;
+  const isChestOpen = state.animatedProgress >= theme.chestOpenProgress - 0.01;
 
   const { markerPoint, totalLength } = state;
 
@@ -175,18 +170,19 @@ export default function JourneyMap({ progress, theme }: JourneyMapProps) {
         />
 
         {/* Invisible motion path — marker & checkpoints */}
-        <path ref={pathRef} d={ROUTE_PATH} fill="none" stroke="none" />
+        <path ref={pathRef} d={theme.routePath} fill="none" stroke="none" />
 
         <RouteCoin
-          x={REWARD_POSITIONS.coin.x}
-          y={REWARD_POSITIONS.coin.y}
+          x={theme.rewardPositions.coin.x}
+          y={theme.rewardPositions.coin.y}
           icon={theme.coin}
           progress={state.animatedProgress}
+          collectThreshold={theme.coinCollectProgress}
         />
 
         <RouteTreasureChest
-          x={REWARD_POSITIONS.chest.x}
-          y={REWARD_POSITIONS.chest.y}
+          x={theme.rewardPositions.chest.x}
+          y={theme.rewardPositions.chest.y}
           isOpen={isChestOpen}
           chestClosed={theme.chestClosed}
           chestOpen={theme.chestOpen}

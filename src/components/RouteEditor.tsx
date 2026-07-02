@@ -1,17 +1,20 @@
 import { useCallback, useMemo, useRef, useState } from "react";
+import MapThemeSwitcher from "./MapThemeSwitcher";
 import { CHEST_HEIGHT, CHEST_WIDTH, COIN_SIZE, MAP_HEIGHT, MAP_WIDTH } from "../utils/pathProgress";
-import { getMapTheme } from "../utils/mapThemes";
+import {
+  getMapTheme,
+  getThemeSavedRewardPositions,
+  getThemeSavedRoute,
+  type MapThemeId,
+} from "../utils/mapThemes";
 import {
   cloneRewardPositions,
-  formatRewardPositionsExport,
-  getDefaultRewardPositions,
-  REWARD_POSITIONS,
+  formatThemeRewardExport,
   type RewardItemId,
   type RewardPositions,
 } from "../utils/rewardPositions";
 import { ROUTE_ACTIVE } from "../styles/colors";
 import {
-  DEFAULT_BEZIER_ROUTE,
   bezierRouteToPathD,
   cloneBezierRoute,
   describeBezierRoute,
@@ -20,12 +23,30 @@ import {
   getAnchorPoint,
   moveAnchor,
   moveControlPoint,
+  parseBezierRoute,
   type BezierRoute,
   type DragTarget,
 } from "../utils/routePathEditor";
 
 const PREVIEW_PROGRESS = 0.5;
-const EDITOR_THEME = getMapTheme("soft");
+
+interface ThemeDraft {
+  route: BezierRoute;
+  rewardPositions: RewardPositions;
+}
+
+interface RouteEditorProps {
+  themeId: MapThemeId;
+  onThemeChange: (themeId: MapThemeId) => void;
+}
+
+function createDraftFromTheme(id: MapThemeId): ThemeDraft {
+  const theme = getMapTheme(id);
+  return {
+    route: cloneBezierRoute(parseBezierRoute(theme.routePath)),
+    rewardPositions: cloneRewardPositions(theme.rewardPositions),
+  };
+}
 
 function dragTargetKey(target: DragTarget | null): string | null {
   if (!target) return null;
@@ -33,10 +54,13 @@ function dragTargetKey(target: DragTarget | null): string | null {
   return `${target.kind}-${target.segmentIndex}`;
 }
 
-export default function RouteEditor() {
+export default function RouteEditor({ themeId, onThemeChange }: RouteEditorProps) {
+  const theme = getMapTheme(themeId);
   const svgRef = useRef<SVGSVGElement>(null);
-  const [route, setRoute] = useState<BezierRoute>(() =>
-    cloneBezierRoute(DEFAULT_BEZIER_ROUTE),
+  const draftsRef = useRef<Partial<Record<MapThemeId, ThemeDraft>>>({});
+
+  const [route, setRoute] = useState<BezierRoute>(
+    () => createDraftFromTheme(themeId).route,
   );
   const [selected, setSelected] = useState<DragTarget | null>(null);
   const [dragging, setDragging] = useState<DragTarget | null>(null);
@@ -44,17 +68,60 @@ export default function RouteEditor() {
   const [showCoords, setShowCoords] = useState(false);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
   const [rewardCopyStatus, setRewardCopyStatus] = useState<string | null>(null);
-  const [rewardPositions, setRewardPositions] = useState<RewardPositions>(() =>
-    cloneRewardPositions(REWARD_POSITIONS),
+  const [rewardPositions, setRewardPositions] = useState<RewardPositions>(
+    () => createDraftFromTheme(themeId).rewardPositions,
   );
   const [selectedReward, setSelectedReward] = useState<RewardItemId | null>(null);
   const [draggingReward, setDraggingReward] = useState<RewardItemId | null>(null);
 
+  const saveCurrentDraft = useCallback(() => {
+    draftsRef.current[themeId] = {
+      route: cloneBezierRoute(route),
+      rewardPositions: cloneRewardPositions(rewardPositions),
+    };
+  }, [themeId, route, rewardPositions]);
+
+  const handleThemeChange = useCallback(
+    (nextThemeId: MapThemeId) => {
+      if (nextThemeId === themeId) return;
+
+      saveCurrentDraft();
+
+      const savedDraft = draftsRef.current[nextThemeId];
+      const nextDraft = savedDraft ?? createDraftFromTheme(nextThemeId);
+
+      setRoute(cloneBezierRoute(nextDraft.route));
+      setRewardPositions(cloneRewardPositions(nextDraft.rewardPositions));
+      setSelected(null);
+      setDragging(null);
+      setSelectedReward(null);
+      setDraggingReward(null);
+      setCopyStatus(null);
+      setRewardCopyStatus(null);
+      onThemeChange(nextThemeId);
+    },
+    [onThemeChange, saveCurrentDraft, themeId],
+  );
+
   const pathD = useMemo(() => bezierRouteToPathD(route), [route]);
-  const exportText = useMemo(() => formatPathForExport(pathD), [pathD]);
+  const exportText = useMemo(
+    () => formatPathForExport(pathD, themeId),
+    [pathD, themeId],
+  );
   const rewardExportText = useMemo(
-    () => formatRewardPositionsExport(rewardPositions),
-    [rewardPositions],
+    () =>
+      formatThemeRewardExport(
+        themeId,
+        rewardPositions,
+        theme.coinCollectProgress,
+        theme.chestOpenProgress,
+      ),
+    [
+      themeId,
+      rewardPositions,
+      theme.coinCollectProgress,
+      theme.chestOpenProgress,
+    ],
   );
   const coordLines = useMemo(() => describeBezierRoute(route), [route]);
 
@@ -140,11 +207,11 @@ export default function RouteEditor() {
   );
 
   const handleReset = useCallback(() => {
-    setRoute(cloneBezierRoute(DEFAULT_BEZIER_ROUTE));
+    setRoute(cloneBezierRoute(parseBezierRoute(getThemeSavedRoute(themeId))));
     setSelected(null);
     setDragging(null);
     setCopyStatus(null);
-  }, []);
+  }, [themeId]);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -157,11 +224,11 @@ export default function RouteEditor() {
   }, [exportText]);
 
   const handleResetRewards = useCallback(() => {
-    setRewardPositions(getDefaultRewardPositions());
+    setRewardPositions(getThemeSavedRewardPositions(themeId));
     setSelectedReward(null);
     setDraggingReward(null);
     setRewardCopyStatus(null);
-  }, []);
+  }, [themeId]);
 
   const handleCopyRewards = useCallback(async () => {
     try {
@@ -189,7 +256,7 @@ export default function RouteEditor() {
           onPointerLeave={handlePointerUp}
         >
           <image
-            href={EDITOR_THEME.background}
+            href={theme.background}
             x="0"
             y="0"
             width={MAP_WIDTH}
@@ -349,7 +416,7 @@ export default function RouteEditor() {
             y={rewardPositions.coin.y}
             width={COIN_SIZE}
             height={COIN_SIZE}
-            image={EDITOR_THEME.coin}
+            image={theme.coin}
             isSelected={selectedReward === "coin"}
             isDragging={draggingReward === "coin"}
             onPointerDown={(event) => handleRewardPointerDown("coin", event)}
@@ -362,7 +429,7 @@ export default function RouteEditor() {
             y={rewardPositions.chest.y}
             width={CHEST_WIDTH}
             height={CHEST_HEIGHT}
-            image={EDITOR_THEME.chestClosed}
+            image={theme.chestClosed}
             isSelected={selectedReward === "chest"}
             isDragging={draggingReward === "chest"}
             onPointerDown={(event) => handleRewardPointerDown("chest", event)}
@@ -372,10 +439,16 @@ export default function RouteEditor() {
 
       <aside className="route-editor__panel">
         <h2 className="route-editor__title">Route Editor</h2>
+        <p className="route-editor__editing-theme">
+          Editing route for: <strong>{theme.label}</strong>
+        </p>
+
+        <MapThemeSwitcher themeId={themeId} onThemeChange={handleThemeChange} />
+
         <p className="route-editor__hint">
           Drag white anchors to move route points. Drag orange/purple handles to
           bend each cubic segment. Copy the result into{" "}
-          <code>ROUTE_PATH</code> when aligned.
+          <code>MAP_THEMES.{themeId}</code> in <code>src/utils/mapThemes.ts</code>.
         </p>
 
         <label className="route-editor__toggle">
@@ -420,7 +493,7 @@ export default function RouteEditor() {
             className="route-editor__btn route-editor__btn--secondary"
             onClick={handleReset}
           >
-            Reset to current path
+            Reset {theme.label} path
           </button>
         </div>
 
@@ -447,7 +520,7 @@ export default function RouteEditor() {
         <h3 className="route-editor__subtitle">Reward positions</h3>
         <p className="route-editor__hint">
           Drag the coin and chest on the map. Copy the result into{" "}
-          <code>src/utils/rewardPositions.ts</code> when aligned.
+          <code>MAP_THEMES.{themeId}</code> in <code>src/utils/mapThemes.ts</code>.
         </p>
 
         <div className="route-editor__legend">
@@ -470,7 +543,7 @@ export default function RouteEditor() {
             className="route-editor__btn route-editor__btn--secondary"
             onClick={handleResetRewards}
           >
-            Reset reward positions
+            Reset {theme.label} rewards
           </button>
         </div>
 

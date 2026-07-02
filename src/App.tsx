@@ -111,7 +111,7 @@ export default function App() {
             </div>
           </div>
         ) : (
-          <RouteEditor />
+          <RouteEditor themeId={mapThemeId} onThemeChange={setMapThemeId} />
         )}
       </div>
     </div>
