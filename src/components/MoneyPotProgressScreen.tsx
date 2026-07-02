@@ -7,9 +7,11 @@ import {
   progressToAmount,
   progressToPercent,
 } from "../utils/pathProgress";
+import type { MapTheme } from "../utils/mapThemes";
 
 interface MoneyPotProgressScreenProps {
   progress: number;
+  theme: MapTheme;
   onBack?: () => void;
 }
 
@@ -49,6 +51,7 @@ function WalletIcon() {
 
 export default function MoneyPotProgressScreen({
   progress,
+  theme,
   onBack,
 }: MoneyPotProgressScreenProps) {
   const percent = progressToPercent(progress);
@@ -73,7 +76,7 @@ export default function MoneyPotProgressScreen({
 
       <main className="progress-screen__body">
         <section className="progress-screen__map-card" aria-label="პროგრესის რუკა">
-          <JourneyMap progress={progress} />
+          <JourneyMap progress={progress} theme={theme} />
         </section>
 
         <section className="progress-screen__stats" aria-label="სტატისტიკა">

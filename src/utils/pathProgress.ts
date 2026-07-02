@@ -14,11 +14,9 @@ export interface CheckpointConfig {
   groupOffsetY?: number;
 }
 
-/** Matches /lastone.png pixel dimensions */
+/** Matches map SVG viewBox pixel dimensions */
 export const MAP_WIDTH = 342;
 export const MAP_HEIGHT = 322;
-
-export const MAP_IMAGE = "/lastone.png";
 
 /**
  * Motion path — tuned via Route Editor to match painted road in lastone.png.
@@ -40,6 +38,10 @@ export const CHECKPOINTS: CheckpointConfig[] = [
 ];
 
 export const GOAL_AMOUNT = 8_000;
+
+export const COIN_SIZE = 20;
+export const CHEST_WIDTH = 32;
+export const CHEST_HEIGHT = 28;
 
 export function clampProgress(value: number): number {
   return Math.min(1, Math.max(0, value));

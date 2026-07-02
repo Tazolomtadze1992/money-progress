@@ -3,7 +3,13 @@ import MoneyPotProgressScreen from "./components/MoneyPotProgressScreen";
 import PhoneFrame from "./components/PhoneFrame";
 import ProgressControls from "./components/ProgressControls";
 import RouteEditor from "./components/RouteEditor";
+import MapThemeSwitcher from "./components/MapThemeSwitcher";
 import { clampProgress } from "./utils/pathProgress";
+import {
+  DEFAULT_MAP_THEME_ID,
+  getMapTheme,
+  type MapThemeId,
+} from "./utils/mapThemes";
 
 const SIMULATION_STEPS = [0, 0.25, 0.5, 0.75, 1];
 const STEP_DELAY_MS = 900;
@@ -12,6 +18,7 @@ type AppMode = "prototype" | "editor";
 
 export default function App() {
   const [mode, setMode] = useState<AppMode>("prototype");
+  const [mapThemeId, setMapThemeId] = useState<MapThemeId>(DEFAULT_MAP_THEME_ID);
   const [progress, setProgress] = useState(0.25);
   const [isSimulating, setIsSimulating] = useState(false);
   const simulationRef = useRef<number[]>([]);
@@ -53,6 +60,8 @@ export default function App() {
     };
   }, []);
 
+  const mapTheme = getMapTheme(mapThemeId);
+
   return (
     <div className="app">
       <div className="app__shell">
@@ -75,19 +84,31 @@ export default function App() {
 
         {mode === "prototype" ? (
           <div className="app__layout">
-            <PhoneFrame>
-              <MoneyPotProgressScreen
-                progress={progress}
-                onBack={() => setProgress(0)}
+            <div className="app__layout-side app__layout-side--left">
+              <MapThemeSwitcher
+                themeId={mapThemeId}
+                onThemeChange={setMapThemeId}
               />
-            </PhoneFrame>
+            </div>
 
-            <ProgressControls
-              progress={progress}
-              onProgressChange={handleProgressChange}
-              onSimulateSaving={handleSimulateSaving}
-              isSimulating={isSimulating}
-            />
+            <div className="app__layout-center">
+              <PhoneFrame>
+                <MoneyPotProgressScreen
+                  progress={progress}
+                  theme={mapTheme}
+                  onBack={() => setProgress(0)}
+                />
+              </PhoneFrame>
+            </div>
+
+            <div className="app__layout-side app__layout-side--right">
+              <ProgressControls
+                progress={progress}
+                onProgressChange={handleProgressChange}
+                onSimulateSaving={handleSimulateSaving}
+                isSimulating={isSimulating}
+              />
+            </div>
           </div>
         ) : (
           <RouteEditor />

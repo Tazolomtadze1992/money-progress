@@ -3,11 +3,17 @@ import { usePathProgress } from "../hooks/usePathProgress";
 import {
   CHECKPOINTS,
   MAP_HEIGHT,
-  MAP_IMAGE,
   MAP_WIDTH,
   ROUTE_PATH,
   getPointAtProgress,
 } from "../utils/pathProgress";
+import type { MapTheme } from "../utils/mapThemes";
+import {
+  CHEST_OPEN_PROGRESS,
+  REWARD_POSITIONS,
+} from "../utils/rewardPositions";
+import RouteCoin from "./RouteCoin";
+import RouteTreasureChest from "./RouteTreasureChest";
 import {
   AMOUNT_PILL,
   CHECKPOINT_ACTIVE,
@@ -20,6 +26,7 @@ import {
 
 interface JourneyMapProps {
   progress: number;
+  theme: MapTheme;
 }
 
 /** Simple 5-point star, centered at origin */
@@ -124,7 +131,7 @@ function CheckpointNode({
   );
 }
 
-export default function JourneyMap({ progress }: JourneyMapProps) {
+export default function JourneyMap({ progress, theme }: JourneyMapProps) {
   const { pathRef, state } = usePathProgress({ progress, durationMs: 650 });
   const [pathReady, setPathReady] = useState(false);
 
@@ -146,6 +153,8 @@ export default function JourneyMap({ progress }: JourneyMapProps) {
     });
   }, [progress, pathReady, state.animatedProgress, pathRef]);
 
+  const isChestOpen = state.animatedProgress >= CHEST_OPEN_PROGRESS - 0.01;
+
   const { markerPoint, totalLength } = state;
 
   return (
@@ -157,7 +166,7 @@ export default function JourneyMap({ progress }: JourneyMapProps) {
         aria-label="Savings journey progress map"
       >
         <image
-          href={MAP_IMAGE}
+          href={theme.background}
           x="0"
           y="0"
           width={MAP_WIDTH}
@@ -167,6 +176,21 @@ export default function JourneyMap({ progress }: JourneyMapProps) {
 
         {/* Invisible motion path — marker & checkpoints */}
         <path ref={pathRef} d={ROUTE_PATH} fill="none" stroke="none" />
+
+        <RouteCoin
+          x={REWARD_POSITIONS.coin.x}
+          y={REWARD_POSITIONS.coin.y}
+          icon={theme.coin}
+          progress={state.animatedProgress}
+        />
+
+        <RouteTreasureChest
+          x={REWARD_POSITIONS.chest.x}
+          y={REWARD_POSITIONS.chest.y}
+          isOpen={isChestOpen}
+          chestClosed={theme.chestClosed}
+          chestOpen={theme.chestOpen}
+        />
 
         {positions.map((cp) => (
           <CheckpointNode
