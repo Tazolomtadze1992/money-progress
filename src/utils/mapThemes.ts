@@ -95,7 +95,19 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     background: "/treasure-island.png",
     coin: "/cartoon-coin.svg",
     ...STANDARD_CHEST,
-    ...placeholderThemeData(),
+    routePath:
+      "M 155.8 318.9 " +
+      "C 181.8 292.1, 92.4 274, 119.1 244.7 " +
+      "C 132.7 203.8, 178.6 229.3, 192.1 199.9 " +
+      "C 213.1 182.6, 215.7 174.2, 184 143.2 " +
+      "C 215.1 107.1, 237.3 114.8, 273.8 112.6 " +
+      "C 340.2 101.6, 302.7 101.8, 314.6 68.7 ",
+    rewardPositions: {
+      coin: { x: 125.4, y: 267.8 },
+      chest: { x: 199.4, y: 162.6 },
+    },
+    coinCollectProgress: 0.37,
+    chestOpenProgress: 0.6,
   },
   treasure2: {
     id: "treasure2",
