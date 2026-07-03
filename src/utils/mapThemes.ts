@@ -7,6 +7,11 @@ export type MapThemeId =
   | "treasureIsland"
   | "treasure2";
 
+export interface PassedPathStyle {
+  stroke: string;
+  strokeWidth: number;
+}
+
 export interface MapTheme {
   id: MapThemeId;
   label: string;
@@ -18,6 +23,7 @@ export interface MapTheme {
   rewardPositions: RewardPositions;
   coinCollectProgress: number;
   chestOpenProgress: number;
+  passedPathStyle?: PassedPathStyle;
 }
 
 const STANDARD_CHEST = {
@@ -41,6 +47,16 @@ const CARTOON_REWARD_POSITIONS: RewardPositions = {
 
 const CARTOON_COIN_COLLECT = 0.37;
 const CARTOON_CHEST_OPEN = 0.6;
+
+const PASSED_PATH_NEUTRAL: PassedPathStyle = {
+  stroke: "rgba(24, 39, 45, 0.18)",
+  strokeWidth: 14,
+};
+
+const PASSED_PATH_TREASURE: PassedPathStyle = {
+  stroke: "rgba(76, 52, 28, 0.22)",
+  strokeWidth: 16,
+};
 
 /** Placeholder route/rewards for new themes — edit independently per theme */
 function placeholderThemeData(): Pick<
@@ -72,6 +88,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     },
     coinCollectProgress: CARTOON_COIN_COLLECT,
     chestOpenProgress: CARTOON_CHEST_OPEN,
+    passedPathStyle: PASSED_PATH_NEUTRAL,
   },
   cityNature: {
     id: "cityNature",
@@ -80,6 +97,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     coin: "/cartoon-coin.svg",
     ...STANDARD_CHEST,
     ...placeholderThemeData(),
+    passedPathStyle: PASSED_PATH_NEUTRAL,
   },
   city: {
     id: "city",
@@ -88,6 +106,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     coin: "/cartoon-coin.svg",
     ...STANDARD_CHEST,
     ...placeholderThemeData(),
+    passedPathStyle: PASSED_PATH_NEUTRAL,
   },
   treasureIsland: {
     id: "treasureIsland",
@@ -108,6 +127,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     },
     coinCollectProgress: 0.37,
     chestOpenProgress: 0.6,
+    passedPathStyle: PASSED_PATH_TREASURE,
   },
   treasure2: {
     id: "treasure2",
@@ -128,6 +148,7 @@ export const MAP_THEMES: Record<MapThemeId, MapTheme> = {
     },
     coinCollectProgress: 0.37,
     chestOpenProgress: 0.6,
+    passedPathStyle: PASSED_PATH_TREASURE,
   },
 };
 
@@ -156,4 +177,15 @@ export function getThemeSavedRewardPositions(id: MapThemeId): RewardPositions {
     coin: { ...rewardPositions.coin },
     chest: { ...rewardPositions.chest },
   };
+}
+
+const DEFAULT_PASSED_PATH_STYLE: PassedPathStyle = {
+  stroke: "rgba(40, 32, 24, 0.22)",
+  strokeWidth: 16,
+};
+
+export function getPassedPathStyle(
+  theme: Pick<MapTheme, "passedPathStyle">,
+): PassedPathStyle {
+  return theme.passedPathStyle ?? DEFAULT_PASSED_PATH_STYLE;
 }

@@ -7,6 +7,7 @@ import {
   getPointAtProgress,
 } from "../utils/pathProgress";
 import type { MapTheme } from "../utils/mapThemes";
+import { getPassedPathStyle } from "../utils/mapThemes";
 import RouteCoin from "./RouteCoin";
 import RouteTreasureChest from "./RouteTreasureChest";
 import {
@@ -150,7 +151,8 @@ export default function JourneyMap({ progress, theme }: JourneyMapProps) {
 
   const isChestOpen = state.animatedProgress >= theme.chestOpenProgress - 0.01;
 
-  const { markerPoint, totalLength } = state;
+  const { markerPoint, totalLength, dashOffset, activeLength } = state;
+  const passedPathStyle = getPassedPathStyle(theme);
 
   return (
     <div className="journey-map">
@@ -168,6 +170,21 @@ export default function JourneyMap({ progress, theme }: JourneyMapProps) {
           height={MAP_HEIGHT}
           preserveAspectRatio="xMidYMid meet"
         />
+
+        {totalLength > 0 && activeLength > 0 && (
+          <path
+            d={theme.routePath}
+            fill="none"
+            stroke={passedPathStyle.stroke}
+            strokeWidth={passedPathStyle.strokeWidth}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray={totalLength}
+            strokeDashoffset={dashOffset}
+            pointerEvents="none"
+            aria-hidden="true"
+          />
+        )}
 
         {/* Invisible motion path — marker & checkpoints */}
         <path ref={pathRef} d={theme.routePath} fill="none" stroke="none" />
