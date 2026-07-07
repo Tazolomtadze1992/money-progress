@@ -16,6 +16,7 @@ import {
   CHECKPOINT_ACTIVE_BORDER,
   CHECKPOINT_INACTIVE,
   CHECKPOINT_INACTIVE_BORDER,
+  CHECKPOINT_INACTIVE_OPACITY,
   CHECKPOINT_INACTIVE_STAR,
   CREDO_PRIMARY,
 } from "../styles/colors";
@@ -91,14 +92,16 @@ function CheckpointNode({
 
   return (
     <g transform={`translate(${x + groupOffsetX}, ${y + groupOffsetY})`}>
-      <circle
-        r={badgeRadius}
-        fill={badgeFill}
-        stroke={badgeStroke}
-        strokeWidth={isHighlighted ? 2.5 : 2}
-        style={{ transition: "stroke 400ms ease, fill 400ms ease" }}
-      />
-      <StarIcon size={starSize} fill={starFill} />
+      <g opacity={isHighlighted ? 1 : CHECKPOINT_INACTIVE_OPACITY}>
+        <circle
+          r={badgeRadius}
+          fill={badgeFill}
+          stroke={badgeStroke}
+          strokeWidth={isHighlighted ? 2.5 : 2}
+          style={{ transition: "stroke 400ms ease, fill 400ms ease, opacity 400ms ease" }}
+        />
+        <StarIcon size={starSize} fill={starFill} />
+      </g>
 
       <g transform={`translate(0, ${labelY})`}>
         <rect
